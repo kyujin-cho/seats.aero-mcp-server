@@ -1,45 +1,122 @@
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
-# seats.aero MCP server
+# seats.aero MCP Server
 
-## Not affiliated with seats.aero
+**Not affiliated with seats.aero**
 
-A TypeScript-based, minimal MCP server for interacting with the seats.aero API via Claude desktop or any other MCP clients in natural language.
+A TypeScript-based MCP server for searching award flight availability through the [seats.aero](https://seats.aero) API via Claude or any other MCP client.
 
-❗ You will need a seats.aero API key via a seats.aero Pro membership in order to use this tool
+You will need a seats.aero API key via a [seats.aero Pro membership](https://seats.aero) to use this server.
 
-### Setup
+## Quick Start (Pre-built Binary)
 
-Install dependencies
-`pnpm i`
+Download the latest binary for your platform from [Releases](https://github.com/gavgrego/seats.aero-mcp-server/releases/latest):
 
-Build and compile TypeScript
-`pnpm build`
+| Platform | Binary |
+|----------|--------|
+| macOS (Apple Silicon) | `seats-mcp-darwin-arm64` |
+| macOS (Intel) | `seats-mcp-darwin-x64` |
+| Linux (x64) | `seats-mcp-linux-x64` |
+| Linux (ARM64) | `seats-mcp-linux-arm64` |
 
-Start MCP server
-`pnpm start`
+After downloading, make it executable:
 
-### Config
+```bash
+chmod +x seats-mcp-darwin-arm64
+```
 
-You will need to add your MCP server config to your `claude_desktop_config.json` file or whatever your MCP client of choice is.
+Verify the download (optional):
+
+```bash
+# Download checksums.txt from the same release, then:
+sha256sum -c checksums.txt
+```
+
+## Configuration
+
+### Claude Code
+
+```bash
+claude mcp add seats -- /path/to/seats-mcp-darwin-arm64
+```
+
+Then set your API key:
+
+```bash
+claude mcp update seats -e SEATS_API_KEY=your-api-key
+```
+
+### Claude Desktop
+
+Add the following to your `claude_desktop_config.json`:
+
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
-"seats": {
-  "command": "node",
-  "args": ["/Users/USER/Sites/seats-mcp/build/index.js"],
-  "env": {
-    "SEATS_API_KEY": "SEATS_API_KEY"
+{
+  "mcpServers": {
+    "seats": {
+      "command": "/path/to/seats-mcp-darwin-arm64",
+      "env": {
+        "SEATS_API_KEY": "your-api-key"
+      }
+    }
   }
 }
 ```
 
-### Tools available
+## Tools
 
-`get_flights`
-Get a list of flights. Your MCP client will be able to search via the same parameters as the [cached search endpoint](https://developers.seats.aero/reference/cached-search)
+### `get_flights`
 
-`get_bulk_avail`
-Retrieve a large amount of availability objects from one specific mileage program (source). Your MCP client will be able to search via the same parameters as the [bulk availability endpoint](https://developers.seats.aero/reference/get-availability)
+Search for cached award flights. Supports the same parameters as the [cached search endpoint](https://developers.seats.aero/reference/cached-search) including origin/destination airports, dates, cabin class, and carriers.
 
-`get_routes`
-Retrieve a list of route objects from one specific mileage program (source). Your MCP client will be able to search via the same parameters as the [routes endpoint](https://developers.seats.aero/reference/get-routes-1).
+### `get_bulk_avail`
+
+Retrieve bulk availability from a specific mileage program (source). Supports the same parameters as the [bulk availability endpoint](https://developers.seats.aero/reference/get-availability).
+
+### `get_routes`
+
+Retrieve routes from a specific mileage program (source). Supports the same parameters as the [routes endpoint](https://developers.seats.aero/reference/get-routes-1).
+
+## Development
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18+)
+- [pnpm](https://pnpm.io/)
+- [Bun](https://bun.sh/) (for compiling binaries)
+
+### Setup
+
+```bash
+pnpm install
+pnpm build
+pnpm start
+```
+
+### Building Binaries Locally
+
+```bash
+# Build all platforms
+bun run compile
+
+# Build a specific platform
+bun run compile:darwin-arm64
+```
+
+## Releasing
+
+Releases are automated via GitHub Actions. To create a new release:
+
+```bash
+git tag v1.0.2
+git push origin v1.0.2
+```
+
+This builds binaries for all platforms and publishes them as a GitHub Release with SHA-256 checksums.
+
+## License
+
+[MPL-2.0](LICENSE)

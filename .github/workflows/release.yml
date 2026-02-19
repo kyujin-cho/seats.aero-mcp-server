@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Compile binaries
+        run: bun run compile
+
+      - name: Generate checksums
+        working-directory: dist
+        run: sha256sum seats-mcp-* > checksums.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/seats-mcp-darwin-arm64
+            dist/seats-mcp-darwin-x64
+            dist/seats-mcp-linux-x64
+            dist/seats-mcp-linux-arm64
+            dist/checksums.txt

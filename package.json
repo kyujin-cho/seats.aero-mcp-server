@@ -8,7 +8,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "dev": "tsc --watch",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "compile": "bun run compile:darwin-arm64 && bun run compile:darwin-x64 && bun run compile:linux-x64 && bun run compile:linux-arm64",
+    "compile:darwin-arm64": "bun build --compile --minify --sourcemap --target=bun-darwin-arm64 src/index.ts --outfile dist/seats-mcp-darwin-arm64",
+    "compile:darwin-x64": "bun build --compile --minify --sourcemap --target=bun-darwin-x64 src/index.ts --outfile dist/seats-mcp-darwin-x64",
+    "compile:linux-x64": "bun build --compile --minify --sourcemap --target=bun-linux-x64 src/index.ts --outfile dist/seats-mcp-linux-x64",
+    "compile:linux-arm64": "bun build --compile --minify --sourcemap --target=bun-linux-arm64 src/index.ts --outfile dist/seats-mcp-linux-arm64"
   },
   "keywords": [],
   "author": "Gavin Gregory <gavin@thecomponent.studio>",
